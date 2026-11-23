@@ -1,0 +1,26 @@
+name: P19 exact latest-main compatibility audit
+
+on:
+  push:
+    branches:
+      - research/p19-current-upstream-compat-20261124
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  latest-main-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v7
+      - name: Static analysis
+        run: uvx ruff check .
+      - name: All upstream tests including new P19 cases
+        run: uv run --python ${{ matrix.python }} pytest -q
